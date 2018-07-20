@@ -1,5 +1,5 @@
 import numpy as np
-import sigstuff as sig
+import rigiditypy.sigstuff as sig
 import networkx as nx
 import cvxpy as cvx
 
