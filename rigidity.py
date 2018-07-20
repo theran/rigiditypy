@@ -71,4 +71,27 @@ def find_psd_stress(edge_list,P,is_Phat=False,**kwargs):
     prob = cvx.Problem(obj, constraints)
     prob.solve(**kwargs)
     return X.value, prob.value, prob.status, prob
+
+def has_stretched_cycle(edge_list, P):
+    """
+    Checks if a graph on the line has a stretched cycle
+
+    edge_list is a list of edges [i,j]
+    P is a n x 1 configuration matrix
+    """
+    # form digraph oriented left to right using P
+    G = nx.DiGraph()
+    G.add_nodes_from(range(len(P)))
+    for e in edge_list:
+        e = list(e)
+        if P[e[1]] < P[e[0]]:
+            e.reverse()
+        G.add_edge(*e)
     
+    # remove each edge and see if there's another directed path
+    for e in G.edges():
+        G.remove_edge(*e)
+        if nx.has_path(G, *e):
+            return True
+        G.add_edge(*e)
+    return False
