@@ -51,10 +51,6 @@ def adjacency_matrix(G,bar=False):
         G = nx.complement(G)
     return nx.adj_matrix(G).todense().astype(np.float64)
 
-def zeros_constraints(X,A):
-    n,_ = X.shape
-    return [ X[i,j]*A[i,j] == 0 for i in range(n) for j in range(n) ]
-
 def find_psd_stress(edge_list,P,is_Phat=False,**kwargs):
     """
     Tries to find a PSD stress for dimension d.
@@ -71,8 +67,8 @@ def find_psd_stress(edge_list,P,is_Phat=False,**kwargs):
     n,dplusone = P.shape
     X = cvx.Variable((n,n),PSD=True)
     obj = cvx.Maximize(cvx.lambda_sum_smallest(X, dplusone+1))
-    # prob = cvx.Problem(obj, [cvx.trace(X) == n,X*P == np.zeros((n,dplusone))] + zeros_constraints(X,Abar))
-    prob = cvx.Problem(obj, [cvx.trace(X) == n,X*P == np.zeros((n,dplusone)),cvx.multiply(X,Abar)== np.zeros((n,n))])
+    constraints = [cvx.trace(X) == n, X*P == np.zeros((n,dplusone)),cvx.multiply(X,Abar) == np.zeros((n,n))]
+    prob = cvx.Problem(obj, constraints)
     prob.solve(**kwargs)
-    return X.value, prob.value, prob.status
+    return X.value, prob.value, prob.status, prob
     
