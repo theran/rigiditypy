@@ -2,6 +2,10 @@ import numpy as np
 import cvxpy as cvx
 
 def nullspace(A, atol=1e-13, rtol=0):
+    """
+    nullspace of a matrix, from https://stackoverflow.com/a/49852558 which cites
+    http://scipy-cookbook.readthedocs.io/items/RankNullspace.html
+    """
     A = np.atleast_2d(A)
     u, s, vh = np.linalg.svd(A)
     tol = max(atol, rtol * s[0])
@@ -10,7 +14,7 @@ def nullspace(A, atol=1e-13, rtol=0):
     return ns
 
 def signature(A, atol=1e-13):
-    eigs = np.linalg.eigvals(A)
+    eigs = np.linalg.eigvalsh(A)
     eigs = [np.sign(eig) if abs(eig)>atol else 0 for eig in eigs]
     numpos = eigs.count(1)
     numneg = eigs.count(-1)
